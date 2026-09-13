@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stuckit support</title>
+<meta name="description" content="Help with Stuckit: getting the watch to record, and redoing a calibration.">
+<script>try { var s = localStorage.getItem('stuckit-theme'); if (s === 'light' || s === 'dark') document.documentElement.setAttribute('data-theme', s); } catch (e) {}</script>
+<style>
+
+:root { --ground: #fff; --ink: #000; --ink-2: rgba(0,0,0,.74); --hair: rgba(0,0,0,.14);
+  --face: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ground: #000; --ink: #fff; --ink-2: rgba(255,255,255,.76); --hair: rgba(255,255,255,.16); color-scheme: dark; } }
+:root[data-theme="dark"] { --ground: #000; --ink: #fff; --ink-2: rgba(255,255,255,.76); --hair: rgba(255,255,255,.16); color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; padding-inline: 20px; background: var(--ground); color: var(--ink); font-family: var(--face); font-weight: 400; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 6px; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 60px; max-width: 34rem; margin: 0 auto; border-bottom: 1px solid var(--hair); }
+header a { display: flex; align-items: center; min-height: 44px; text-decoration: none; }
+
+.back { gap: 5px; margin-left: -4px; padding-right: 10px; font-size: 17px; }
+.back svg { width: 10px; height: 17px; display: block; }
+.back:hover span { text-decoration: underline; text-underline-offset: 3px; }
+.home svg { height: 14px; width: auto; display: block; }
+main { max-width: 34rem; margin: 0 auto; padding-block: 48px 24px; }
+h1 { font-size: clamp(30px, 6vw, 40px); font-weight: 300; line-height: 1.15; margin: 0 0 20px; text-wrap: balance; }
+h2 { font-size: 22px; font-weight: 300; line-height: 1.3; margin: 40px 0 12px; text-wrap: balance; }
+p, li { font-size: 18px; line-height: 1.6; }
+p { margin: 0 0 20px; }
+ol { margin: 0; padding-left: 1.3em; display: grid; gap: 10px; }
+.todo { border-bottom: 1px dashed currentColor; }
+footer { max-width: 34rem; margin: 40px auto 0; padding-block: 20px 28px; border-top: 1px solid var(--hair); display: flex; justify-content: space-between; font-size: 14px; font-weight: 400; color: var(--ink-2); }
+footer a { text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="index.html" aria-label="Back to Stuckit">
+    <svg viewBox="0 0 10 17" aria-hidden="true"><path d="M8.5 1.5 1.5 8.5l7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Back</span>
+  </a>
+  <a class="home" href="index.html" aria-label="Stuckit home">
+    <svg viewBox="0 158 698 89" role="img" aria-label="Stuckit" fill="currentColor">
+      <path d="M32.04 160.60Q38.47 160.60 40.74 161.39Q43.02 162.18 44.40 162.21Q45.79 162.23 47.07 162.97Q48.36 163.72 50.24 164.16Q52.12 164.61 54.51 166.21Q56.91 167.82 56.07 170.59Q55.23 173.36 54.84 174.00Q54.44 174.64 52.09 173.19Q49.74 171.73 47.86 171.28Q45.98 170.84 44.70 170.09Q43.41 169.35 40.45 168.93Q37.48 168.51 36.79 168.12Q36.10 167.72 31.25 167.72Q26.40 167.72 25.71 168.12Q25.02 168.51 23.64 168.54Q22.25 168.56 18.99 170.19Q15.72 171.83 13.87 173.68Q12.02 175.53 10.75 178.90Q9.49 182.26 10.36 185.72Q11.22 189.18 12.68 190.64Q14.14 192.10 17.80 194.13Q21.46 196.15 31.25 198.58Q41.04 201.00 46.68 203.42Q52.31 205.84 54.56 207.70Q56.81 209.55 58.45 212.42Q60.08 215.29 60.50 216.97Q60.92 218.65 60.92 221.52Q60.92 224.39 60.52 225.08Q60.13 225.77 60.10 227.16Q60.08 228.54 58.84 231.01Q57.61 233.48 56.24 235.27Q54.88 237.05 53.20 238.31Q51.52 239.57 47.86 241.20Q44.21 242.83 40.84 243.25Q37.48 243.67 36.79 244.07Q36.10 244.46 33.72 244.46Q31.35 244.46 26.90 244.46Q22.45 244.46 21.76 244.07Q21.06 243.67 19.28 243.65Q17.50 243.62 13.94 242.43Q10.38 241.25 7.91 240.01Q5.44 238.78 2.72 236.72Q0.00 234.67 0.02 233.68Q0.05 232.69 1.46 230.27Q2.87 227.85 6.13 230.15Q9.39 232.45 14.64 234.47Q19.88 236.50 21.26 236.53Q22.65 236.55 23.34 236.95Q24.03 237.34 29.67 237.34Q35.31 237.34 36.00 236.95Q36.69 236.55 38.47 236.53Q40.25 236.50 42.33 235.66Q44.40 234.82 47.37 232.27Q50.34 229.73 51.25 227.95Q52.17 226.17 52.17 222.71Q52.17 219.24 51.25 217.46Q50.34 215.68 47.77 213.53Q45.19 211.38 43.51 210.54Q41.83 209.70 33.62 207.67Q25.42 205.65 19.48 203.67Q13.55 201.69 11.37 200.38Q9.20 199.07 6.72 196.60Q4.25 194.13 3.34 192.35Q2.42 190.57 2.00 189.28Q1.58 187.99 1.58 183.54Q1.58 179.09 2.00 177.41Q2.42 175.73 4.13 172.77Q5.83 169.80 7.22 168.44Q8.60 167.08 12.26 165.05Q15.92 163.02 18.39 162.21Q20.87 161.39 22.65 161.37Q24.43 161.34 24.95 160.97Q25.46 160.60 25.54 160.60Q25.61 160.60 32.04 160.60Z"/>
+      <path d="M132.64 161.47Q166.09 161.54 165.97 165.03Q165.84 168.51 151.90 168.51Q137.95 168.51 137.48 168.86Q137.02 169.21 136.94 192.15Q136.87 215.09 136.87 229.23Q136.87 243.37 132.54 243.45Q128.21 243.52 128.16 206.46Q128.12 169.40 127.60 168.96Q127.08 168.51 113.13 168.51Q99.19 168.51 99.11 164.95Q99.04 161.39 99.11 161.39Q99.19 161.39 132.64 161.47Z"/>
+      <path d="M215.34 161.54Q219.15 161.69 219.15 185.92Q219.15 210.15 219.54 210.84Q219.94 211.53 219.94 214.00Q219.94 216.48 220.33 217.17Q220.73 217.86 220.73 219.15Q220.73 220.43 221.54 222.51Q222.36 224.58 224.07 227.16Q225.77 229.73 227.95 231.48Q230.12 233.24 233.78 234.87Q237.44 236.50 240.01 236.53Q242.58 236.55 243.28 236.95Q243.97 237.34 245.55 236.95Q247.13 236.55 249.60 236.55Q252.08 236.55 255.44 235.29Q258.80 234.03 261.77 231.48Q264.74 228.94 266.84 225.18Q268.94 221.42 269.36 218.06Q269.78 214.69 270.17 214.00Q270.57 213.31 270.57 187.50Q270.57 161.69 274.45 161.57Q278.33 161.44 278.41 163.74Q278.48 166.04 278.48 191.65Q278.48 217.27 277.67 220.53Q276.85 223.79 275.22 227.45Q273.59 231.11 270.64 234.47Q267.70 237.84 263.15 240.33Q258.60 242.83 255.34 243.65Q252.08 244.46 244.86 244.46Q237.64 244.46 234.37 243.65Q231.11 242.83 226.56 240.33Q222.01 237.84 219.07 234.47Q216.13 231.11 214.10 226.27Q212.07 221.42 212.05 220.04Q212.03 218.65 211.63 217.96Q211.23 217.27 211.31 189.33Q211.38 161.39 211.46 161.39Q211.53 161.39 215.34 161.54Z"/>
+      <path d="M374.60 160.60Q380.24 160.60 380.93 161.00Q381.63 161.39 384.99 161.81Q388.35 162.23 393.99 165.05Q399.62 167.87 401.80 169.63Q403.98 171.38 404.05 172.37Q404.12 173.36 401.78 175.58Q399.43 177.81 395.97 175.21Q392.50 172.62 387.16 170.56Q381.82 168.51 375.00 168.51Q368.18 168.51 364.12 169.72Q360.07 170.94 358.39 171.78Q356.71 172.62 354.23 174.27Q351.76 175.93 349.29 178.40Q346.82 180.87 343.92 186.21Q341.03 191.55 340.61 194.92Q340.19 198.28 339.79 198.97Q339.40 199.66 339.79 204.91Q340.19 210.15 341.40 213.81Q342.61 217.46 344.64 220.73Q346.67 223.99 349.21 226.56Q351.76 229.13 354.23 230.79Q356.71 232.45 359.18 233.68Q361.65 234.92 364.91 235.73Q368.18 236.55 370.65 236.55Q373.12 236.55 373.81 236.95Q374.51 237.34 376.58 237.34Q378.66 237.34 379.94 236.95Q381.23 236.55 384.79 235.73Q388.35 234.92 390.03 234.08Q391.71 233.24 395.77 230.30Q399.82 227.35 401.97 229.53Q404.12 231.71 404.17 232.50Q404.22 233.29 403.21 234.38Q402.19 235.46 398.44 237.96Q394.68 240.46 388.25 242.46Q381.82 244.46 374.60 244.46Q367.38 244.46 366.69 244.07Q366.00 243.67 364.62 243.65Q363.23 243.62 359.67 242.43Q356.11 241.25 353.64 240.01Q351.17 238.78 348.69 237.12Q346.22 235.46 342.96 232.20Q339.69 228.94 336.80 223.60Q333.91 218.26 332.70 213.81Q331.49 209.36 331.49 202.53Q331.49 195.71 331.88 195.02Q332.28 194.32 332.30 192.94Q332.33 191.55 334.75 185.92Q337.17 180.28 339.23 177.41Q341.28 174.55 342.96 172.86Q344.64 171.18 347.51 169.13Q350.38 167.08 354.43 165.05Q358.48 163.02 361.35 162.21Q364.22 161.39 365.90 161.39Q367.58 161.39 368.20 161.00Q368.82 160.60 368.89 160.60Q368.97 160.60 374.60 160.60Z"/>
+      <path d="M461.38 161.54Q465.19 161.69 465.19 185.52Q465.19 209.36 465.54 209.80Q465.88 210.25 489.91 185.97Q513.94 161.69 518.74 161.57Q523.54 161.44 522.70 162.75Q521.86 164.06 505.39 181.07Q488.92 198.08 488.95 198.67Q488.97 199.27 489.89 200.65Q490.80 202.04 504.45 218.06Q518.10 234.08 522.10 238.73Q526.11 243.37 520.82 243.37Q515.53 243.37 509.99 236.65Q504.45 229.93 496.44 221.12Q488.43 212.32 488.13 211.63Q487.84 210.94 484.97 208.32Q482.10 205.70 473.67 214.05Q465.24 222.41 465.19 232.97Q465.14 243.52 461.23 243.52Q457.33 243.52 457.38 202.46Q457.43 161.39 457.50 161.39Q457.57 161.39 461.38 161.54Z"/>
+      <path d="M578.47 161.54Q582.28 161.69 582.28 202.53Q582.28 243.37 581.93 243.52Q581.59 243.67 577.98 243.52Q574.37 243.37 574.44 202.38Q574.52 161.39 574.59 161.39Q574.66 161.39 578.47 161.54Z"/>
+      <path d="M663.89 161.47Q696.94 161.54 696.82 165.03Q696.70 168.51 682.75 168.51Q668.81 168.51 668.34 168.86Q667.87 169.21 667.80 192.15Q667.72 215.09 667.72 229.23Q667.72 243.37 663.39 243.45Q659.07 243.52 659.02 206.46Q658.97 169.40 658.45 168.96Q657.93 168.51 644.38 168.51Q630.83 168.51 630.76 164.95Q630.69 161.39 630.76 161.39Q630.83 161.39 663.89 161.47Z"/>
+    </svg>
+  </a>
+</header>
+<main>
+  <h1>Support</h1>
+  <p>Questions, problems or feedback: <span class="todo">[contact address]</span>.</p>
+
+  <h2>If the watch records nothing</h2>
+  <ol>
+    <li>Install Stuckit on your Apple Watch: open the Watch app on your iPhone, scroll to Available Apps and install it.</li>
+    <li>Open Stuckit on the watch once and allow the workout. The workout keeps it recording when your arm drops at address.</li>
+    <li>Wear the watch on your lead wrist, the one nearer the target, with the crown toward your fingers.</li>
+    <li>Tap the watch before each shot and stand still until it buzzes.</li>
+  </ol>
+
+  <h2>If calibration says two positions came out backwards</h2>
+  <p>One of those two sets went to the wrong length. Hit both again, making each clearly longer than the last. Stuckit keeps your other position.</p>
+</main>
+<footer>
+  <span>Stuckit &copy; 2026</span>
+  <a href="privacy.html">Privacy</a>
+</footer>
+</body>
+</html>

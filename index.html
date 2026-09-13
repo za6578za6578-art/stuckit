@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stuckit</title>
+<meta name="description" content="Stuckit measures how far back you take the club on every wedge shot, from your Apple Watch, as a percentage of your full backswing.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="preload" as="image" href="assets/screen-reading.jpg">
+<script>
+  (function () {
+    var root = document.documentElement;
+    try {
+      var saved = localStorage.getItem('stuckit-theme');
+      if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+    } catch (e) {}
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var seen = false;
+    try { seen = sessionStorage.getItem('stuckit-intro') === '1'; } catch (e) {}
+    root.classList.add('pre');
+    if (!seen) root.classList.add('intro');
+    function bail() {
+      window.__shown = true;
+      root.classList.remove('pre', 'intro');
+      var layer = document.getElementById('intro');
+      if (layer) layer.remove();
+    }
+    setTimeout(function () { if (!window.__introRunning) bail(); }, 2500);
+    setTimeout(function () { if (!window.__introDone) bail(); }, 6000);
+  })();
+</script>
+<style>
+
+:root {
+  --ground: #ffffff;
+  --ink: #000000;
+  --ink-2: rgba(0, 0, 0, .72);
+  --hair: rgba(0, 0, 0, .14);
+  --face: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --gutter: 20px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #000000; --ink: #ffffff; --ink-2: rgba(255, 255, 255, .74); --hair: rgba(255, 255, 255, .14);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #000000; --ink: #ffffff; --ink-2: rgba(255, 255, 255, .74); --hair: rgba(255, 255, 255, .14);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; padding-inline: var(--gutter);
+  background: var(--ground); color: var(--ink);
+  font-family: var(--face); -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a { color: inherit; }
+img { max-width: 100%; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 6px; }
+
+.intro-layer { display: none; }
+.intro .intro-layer { display: grid; place-items: center; position: fixed; inset: 0; z-index: 30; cursor: pointer; }
+.intro-bg { position: absolute; inset: 0; background: var(--ground); }
+.intro-logo { position: relative; width: min(72vw, 460px); height: auto; color: var(--ink); overflow: visible; transform-origin: 0 0; }
+.intro .bar .lockup { visibility: hidden; }
+
+.bar {
+  position: fixed; inset: 0 0 auto 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  height: calc(64px + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) clamp(16px, 3vw, 40px) 0;
+  background: var(--ground); border-bottom: 1px solid var(--hair);
+}
+.brand { display: flex; align-items: center; min-height: 44px; color: var(--ink); }
+
+.lockup { height: 40px; width: auto; display: block; overflow: visible; }
+.actions { display: flex; align-items: center; gap: 4px; }
+.icon {
+  display: grid; place-items: center; width: 44px; height: 44px;
+  padding: 0; border: 0; background: none; color: var(--ink); cursor: pointer; border-radius: 12px;
+}
+.icon svg { width: 21px; height: 21px; display: block; }
+
+.store {
+  display: inline-flex; flex-direction: column; justify-content: center;
+  height: 38px; padding: 0 14px; margin-right: 6px;
+  background: #000; color: #fff; border: 1px solid #a6a6a6; border-radius: 9px;
+  line-height: 1; white-space: nowrap; cursor: default;
+}
+.store small { font-size: 8.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
+.store span { font-size: 15px; margin-top: 3px; }
+
+main { padding-top: calc(64px + env(safe-area-inset-top)); }
+.hero {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center;
+  gap: clamp(40px, 6vw, 96px);
+  max-width: 1200px; margin: 0 auto;
+  min-height: calc(100svh - 64px - 57px);
+  padding-block: clamp(36px, 7vh, 80px);
+}
+.words { display: grid; gap: clamp(16px, 2vw, 26px); }
+h1 {
+  margin: 0; max-width: 13em;
+  font-size: clamp(31px, 2.6vw + 14px, 54px); line-height: 1.12; font-weight: 300;
+  letter-spacing: -.02em; text-wrap: balance;
+}
+.sub { margin: 0; max-width: 30em; font-size: clamp(18px, .6vw + 14px, 22px); line-height: 1.5; color: var(--ink-2); }
+
+.devices { display: flex; align-items: flex-end; justify-content: center; gap: clamp(20px, 3.5vw, 56px); }
+.dev { position: relative; flex: none; }
+.dev .bezel { position: relative; display: block; width: 100%; height: auto; }
+.dev .screen { position: absolute; object-fit: cover; }
+.phone { width: clamp(176px, 19vw, 280px); }
+.phone .screen { left: 5.333%; top: 2.5%; width: 89.333%; height: 95%; border-radius: 14% / 6.4%; }
+
+.watch { width: clamp(132px, 11vw, 160px); }
+.watch .screen { left: 12.857%; top: 21.818%; width: 74.286%; height: 56.364%; border-radius: 24% / 20%; }
+
+.pre .reveal, .pre .screen { opacity: 0; }
+
+@media (max-width: 820px) {
+  .hero { grid-template-columns: minmax(0, 1fr); min-height: 0; gap: 40px; padding-block: 40px 20px; }
+}
+@media (max-width: 520px) {
+  .store { padding: 0 10px; margin-right: 2px; height: 36px; }
+  .store span { font-size: 13.5px; }
+  .lockup { height: 34px; }
+  .devices { gap: 20px; }
+}
+
+footer {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  max-width: 1200px; margin: 0 auto;
+  padding-block: 6px calc(6px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--hair);
+  font-size: 14px; color: var(--ink-2);
+}
+footer nav { display: flex; gap: 22px; }
+footer a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; }
+footer a:hover { color: var(--ink); }
+
+.menu {
+  position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column;
+  padding: env(safe-area-inset-top) clamp(16px, 3vw, 40px) 0;
+  background: var(--ground);
+  opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility 0s .2s;
+}
+.menu-open .menu { opacity: 1; visibility: visible; transition: opacity .2s ease; }
+.menu .top { display: flex; justify-content: space-between; align-items: center; height: 64px; }
+.menu nav { display: flex; flex-direction: column; gap: 6px; padding-top: 40px; }
+.menu nav a, .menu nav p {
+  margin: 0; font-size: 34px; font-weight: 300; letter-spacing: -.015em; text-decoration: none;
+  min-height: 52px; display: flex; align-items: baseline; gap: 14px;
+}
+.menu nav p small { font-size: 14px; font-weight: 400; letter-spacing: 0; color: var(--ink-2); }
+@media (prefers-reduced-motion: reduce) { .menu { transition: none; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <path id="l1" d="M32.04 160.60Q38.47 160.60 40.74 161.39Q43.02 162.18 44.40 162.21Q45.79 162.23 47.07 162.97Q48.36 163.72 50.24 164.16Q52.12 164.61 54.51 166.21Q56.91 167.82 56.07 170.59Q55.23 173.36 54.84 174.00Q54.44 174.64 52.09 173.19Q49.74 171.73 47.86 171.28Q45.98 170.84 44.70 170.09Q43.41 169.35 40.45 168.93Q37.48 168.51 36.79 168.12Q36.10 167.72 31.25 167.72Q26.40 167.72 25.71 168.12Q25.02 168.51 23.64 168.54Q22.25 168.56 18.99 170.19Q15.72 171.83 13.87 173.68Q12.02 175.53 10.75 178.90Q9.49 182.26 10.36 185.72Q11.22 189.18 12.68 190.64Q14.14 192.10 17.80 194.13Q21.46 196.15 31.25 198.58Q41.04 201.00 46.68 203.42Q52.31 205.84 54.56 207.70Q56.81 209.55 58.45 212.42Q60.08 215.29 60.50 216.97Q60.92 218.65 60.92 221.52Q60.92 224.39 60.52 225.08Q60.13 225.77 60.10 227.16Q60.08 228.54 58.84 231.01Q57.61 233.48 56.24 235.27Q54.88 237.05 53.20 238.31Q51.52 239.57 47.86 241.20Q44.21 242.83 40.84 243.25Q37.48 243.67 36.79 244.07Q36.10 244.46 33.72 244.46Q31.35 244.46 26.90 244.46Q22.45 244.46 21.76 244.07Q21.06 243.67 19.28 243.65Q17.50 243.62 13.94 242.43Q10.38 241.25 7.91 240.01Q5.44 238.78 2.72 236.72Q0.00 234.67 0.02 233.68Q0.05 232.69 1.46 230.27Q2.87 227.85 6.13 230.15Q9.39 232.45 14.64 234.47Q19.88 236.50 21.26 236.53Q22.65 236.55 23.34 236.95Q24.03 237.34 29.67 237.34Q35.31 237.34 36.00 236.95Q36.69 236.55 38.47 236.53Q40.25 236.50 42.33 235.66Q44.40 234.82 47.37 232.27Q50.34 229.73 51.25 227.95Q52.17 226.17 52.17 222.71Q52.17 219.24 51.25 217.46Q50.34 215.68 47.77 213.53Q45.19 211.38 43.51 210.54Q41.83 209.70 33.62 207.67Q25.42 205.65 19.48 203.67Q13.55 201.69 11.37 200.38Q9.20 199.07 6.72 196.60Q4.25 194.13 3.34 192.35Q2.42 190.57 2.00 189.28Q1.58 187.99 1.58 183.54Q1.58 179.09 2.00 177.41Q2.42 175.73 4.13 172.77Q5.83 169.80 7.22 168.44Q8.60 167.08 12.26 165.05Q15.92 163.02 18.39 162.21Q20.87 161.39 22.65 161.37Q24.43 161.34 24.95 160.97Q25.46 160.60 25.54 160.60Q25.61 160.60 32.04 160.60Z"/>
+    <path id="l2" d="M132.64 161.47Q166.09 161.54 165.97 165.03Q165.84 168.51 151.90 168.51Q137.95 168.51 137.48 168.86Q137.02 169.21 136.94 192.15Q136.87 215.09 136.87 229.23Q136.87 243.37 132.54 243.45Q128.21 243.52 128.16 206.46Q128.12 169.40 127.60 168.96Q127.08 168.51 113.13 168.51Q99.19 168.51 99.11 164.95Q99.04 161.39 99.11 161.39Q99.19 161.39 132.64 161.47Z"/>
+    <path id="l3" d="M215.34 161.54Q219.15 161.69 219.15 185.92Q219.15 210.15 219.54 210.84Q219.94 211.53 219.94 214.00Q219.94 216.48 220.33 217.17Q220.73 217.86 220.73 219.15Q220.73 220.43 221.54 222.51Q222.36 224.58 224.07 227.16Q225.77 229.73 227.95 231.48Q230.12 233.24 233.78 234.87Q237.44 236.50 240.01 236.53Q242.58 236.55 243.28 236.95Q243.97 237.34 245.55 236.95Q247.13 236.55 249.60 236.55Q252.08 236.55 255.44 235.29Q258.80 234.03 261.77 231.48Q264.74 228.94 266.84 225.18Q268.94 221.42 269.36 218.06Q269.78 214.69 270.17 214.00Q270.57 213.31 270.57 187.50Q270.57 161.69 274.45 161.57Q278.33 161.44 278.41 163.74Q278.48 166.04 278.48 191.65Q278.48 217.27 277.67 220.53Q276.85 223.79 275.22 227.45Q273.59 231.11 270.64 234.47Q267.70 237.84 263.15 240.33Q258.60 242.83 255.34 243.65Q252.08 244.46 244.86 244.46Q237.64 244.46 234.37 243.65Q231.11 242.83 226.56 240.33Q222.01 237.84 219.07 234.47Q216.13 231.11 214.10 226.27Q212.07 221.42 212.05 220.04Q212.03 218.65 211.63 217.96Q211.23 217.27 211.31 189.33Q211.38 161.39 211.46 161.39Q211.53 161.39 215.34 161.54Z"/>
+    <path id="l4" d="M374.60 160.60Q380.24 160.60 380.93 161.00Q381.63 161.39 384.99 161.81Q388.35 162.23 393.99 165.05Q399.62 167.87 401.80 169.63Q403.98 171.38 404.05 172.37Q404.12 173.36 401.78 175.58Q399.43 177.81 395.97 175.21Q392.50 172.62 387.16 170.56Q381.82 168.51 375.00 168.51Q368.18 168.51 364.12 169.72Q360.07 170.94 358.39 171.78Q356.71 172.62 354.23 174.27Q351.76 175.93 349.29 178.40Q346.82 180.87 343.92 186.21Q341.03 191.55 340.61 194.92Q340.19 198.28 339.79 198.97Q339.40 199.66 339.79 204.91Q340.19 210.15 341.40 213.81Q342.61 217.46 344.64 220.73Q346.67 223.99 349.21 226.56Q351.76 229.13 354.23 230.79Q356.71 232.45 359.18 233.68Q361.65 234.92 364.91 235.73Q368.18 236.55 370.65 236.55Q373.12 236.55 373.81 236.95Q374.51 237.34 376.58 237.34Q378.66 237.34 379.94 236.95Q381.23 236.55 384.79 235.73Q388.35 234.92 390.03 234.08Q391.71 233.24 395.77 230.30Q399.82 227.35 401.97 229.53Q404.12 231.71 404.17 232.50Q404.22 233.29 403.21 234.38Q402.19 235.46 398.44 237.96Q394.68 240.46 388.25 242.46Q381.82 244.46 374.60 244.46Q367.38 244.46 366.69 244.07Q366.00 243.67 364.62 243.65Q363.23 243.62 359.67 242.43Q356.11 241.25 353.64 240.01Q351.17 238.78 348.69 237.12Q346.22 235.46 342.96 232.20Q339.69 228.94 336.80 223.60Q333.91 218.26 332.70 213.81Q331.49 209.36 331.49 202.53Q331.49 195.71 331.88 195.02Q332.28 194.32 332.30 192.94Q332.33 191.55 334.75 185.92Q337.17 180.28 339.23 177.41Q341.28 174.55 342.96 172.86Q344.64 171.18 347.51 169.13Q350.38 167.08 354.43 165.05Q358.48 163.02 361.35 162.21Q364.22 161.39 365.90 161.39Q367.58 161.39 368.20 161.00Q368.82 160.60 368.89 160.60Q368.97 160.60 374.60 160.60Z"/>
+    <path id="l5" d="M461.38 161.54Q465.19 161.69 465.19 185.52Q465.19 209.36 465.54 209.80Q465.88 210.25 489.91 185.97Q513.94 161.69 518.74 161.57Q523.54 161.44 522.70 162.75Q521.86 164.06 505.39 181.07Q488.92 198.08 488.95 198.67Q488.97 199.27 489.89 200.65Q490.80 202.04 504.45 218.06Q518.10 234.08 522.10 238.73Q526.11 243.37 520.82 243.37Q515.53 243.37 509.99 236.65Q504.45 229.93 496.44 221.12Q488.43 212.32 488.13 211.63Q487.84 210.94 484.97 208.32Q482.10 205.70 473.67 214.05Q465.24 222.41 465.19 232.97Q465.14 243.52 461.23 243.52Q457.33 243.52 457.38 202.46Q457.43 161.39 457.50 161.39Q457.57 161.39 461.38 161.54Z"/>
+    <path id="l6" d="M578.47 161.54Q582.28 161.69 582.28 202.53Q582.28 243.37 581.93 243.52Q581.59 243.67 577.98 243.52Q574.37 243.37 574.44 202.38Q574.52 161.39 574.59 161.39Q574.66 161.39 578.47 161.54Z"/>
+    <path id="l7" d="M663.89 161.47Q696.94 161.54 696.82 165.03Q696.70 168.51 682.75 168.51Q668.81 168.51 668.34 168.86Q667.87 169.21 667.80 192.15Q667.72 215.09 667.72 229.23Q667.72 243.37 663.39 243.45Q659.07 243.52 659.02 206.46Q658.97 169.40 658.45 168.96Q657.93 168.51 644.38 168.51Q630.83 168.51 630.76 164.95Q630.69 161.39 630.76 161.39Q630.83 161.39 663.89 161.47Z"/>
+    <path id="ball" d="M909.81 188.29Q911.10 188.29 912.08 188.76Q913.07 189.23 914.61 191.28Q916.14 193.33 916.11 194.72Q916.09 196.10 915.25 197.78Q914.41 199.47 912.36 200.36Q910.31 201.25 909.81 201.49Q909.32 201.74 907.93 201.27Q906.55 200.80 905.01 198.75Q903.48 196.70 903.48 194.62Q903.48 192.54 903.95 191.55Q904.42 190.57 906.40 189.43Q908.38 188.29 908.45 188.29Q908.52 188.29 909.81 188.29Z"/>
+    <path id="green" d="M922.47 135.28Q930.87 135.28 931.42 135.83Q931.96 136.37 931.94 137.36Q931.91 138.35 931.49 138.77Q931.07 139.19 924.94 139.22Q918.81 139.24 918.12 139.64Q917.43 140.03 914.95 140.03Q912.48 140.03 911.79 140.43Q911.10 140.82 909.41 140.82Q907.73 140.82 907.04 141.22Q906.35 141.61 903.38 142.03Q900.42 142.45 892.11 145.62Q883.80 148.78 878.96 151.11Q874.11 153.43 866.50 155.83Q858.88 158.23 857.20 158.23Q855.52 158.23 852.45 159.02Q849.39 159.81 846.52 159.81Q843.65 159.81 842.96 160.21Q842.27 160.60 824.37 160.60Q806.47 160.60 805.78 161.00Q805.08 161.39 801.03 161.39Q796.97 161.39 796.28 161.79Q795.59 162.18 793.91 162.18Q792.23 162.18 791.53 162.58Q790.84 162.97 787.18 163.37Q783.52 163.77 778.28 165.37Q773.04 166.98 769.38 168.61Q765.72 170.24 761.67 173.09Q757.62 175.93 755.93 177.61Q754.25 179.29 752.60 181.76Q750.94 184.24 749.68 187.60Q748.42 190.96 748.42 193.83Q748.42 196.70 749.23 199.57Q750.05 202.43 750.89 203.72Q751.73 205.00 754.77 208.04Q757.81 211.09 761.87 213.11Q765.92 215.14 768.39 215.96Q770.87 216.77 772.15 216.77Q773.44 216.77 774.13 217.17Q774.82 217.56 777.29 217.56Q779.77 217.56 780.46 217.96Q781.15 218.35 798.26 217.96Q815.37 217.56 816.06 217.96Q816.75 218.35 820.02 218.35Q823.28 218.35 823.97 218.75Q824.66 219.15 825.95 219.15Q827.24 219.15 830.50 219.96Q833.76 220.78 839.30 222.76Q844.84 224.73 846.42 225.82Q848.00 226.91 848.89 227.06Q849.78 227.21 863.92 236.55Q878.07 245.90 882.12 247.92Q886.17 249.95 891.81 251.95Q897.45 253.96 898.73 253.96Q900.02 253.96 902.69 254.75Q905.36 255.54 907.44 255.54Q909.51 255.54 910.21 255.93Q910.90 256.33 919.30 256.33Q927.71 256.33 928.40 255.93Q929.09 255.54 931.17 255.54Q933.25 255.54 933.94 255.14Q934.63 254.75 937.90 254.35Q941.16 253.96 944.82 252.74Q948.48 251.53 954.11 249.11Q959.75 246.69 965.39 243.05Q971.02 239.42 975.87 234.97Q980.72 230.52 984.35 225.67Q987.98 220.83 990.01 216.77Q992.04 212.72 993.23 209.16Q994.41 205.60 994.44 203.82Q994.46 202.04 994.86 201.34Q995.25 200.65 995.25 194.22Q995.25 187.80 993.25 181.37Q991.25 174.94 987.56 169.21Q983.88 163.47 980.22 159.81Q976.56 156.15 969.74 151.73Q962.92 147.30 958.17 145.62Q953.42 143.94 951.74 143.49Q950.06 143.05 949.34 142.28Q948.63 141.52 948.75 140.23Q948.87 138.94 950.16 138.70Q951.44 138.45 956.29 140.06Q961.14 141.66 965.98 144.09Q970.83 146.51 974.88 149.35Q978.94 152.19 982.99 156.25Q987.05 160.31 989.89 164.36Q992.73 168.41 994.36 171.68Q995.99 174.94 997.18 178.50Q998.37 182.06 998.39 183.45Q998.42 184.83 998.81 185.52Q999.21 186.21 999.21 188.69Q999.21 191.16 999.60 191.85Q1000.00 192.54 999.60 197.39Q999.21 202.24 997.60 208.27Q995.99 214.30 993.57 219.15Q991.15 223.99 989.57 226.36Q987.98 228.74 983.06 234.08Q978.14 239.42 973.30 243.05Q968.45 246.69 961.63 250.30Q954.81 253.91 951.64 255.09Q948.48 256.28 943.63 257.49Q938.79 258.70 937.50 258.70Q936.21 258.70 935.52 259.10Q934.83 259.49 933.54 259.49Q932.26 259.49 931.57 259.89Q930.87 260.28 926.42 260.28Q921.97 260.28 921.28 260.68Q920.59 261.08 918.91 261.08Q917.23 261.08 916.53 260.68Q915.84 260.28 911.39 260.28Q906.94 260.28 906.25 259.89Q905.56 259.49 902.29 259.10Q899.03 258.70 893.39 257.10Q887.76 255.49 881.72 252.67Q875.69 249.85 862.34 240.90Q848.99 231.95 844.94 229.92Q840.88 227.90 836.53 226.32Q832.18 224.73 829.21 224.31Q826.25 223.89 825.55 223.50Q824.86 223.10 822.39 223.10Q819.92 223.10 819.22 222.71Q818.53 222.31 797.47 222.31Q776.40 222.31 775.71 221.91Q775.02 221.52 773.24 221.49Q771.46 221.47 766.71 219.89Q761.97 218.31 758.21 216.20Q754.45 214.10 751.11 210.74Q747.77 207.38 746.12 203.22Q744.46 199.07 744.46 194.22Q744.46 189.38 746.12 184.83Q747.77 180.28 751.90 175.73Q756.03 171.18 757.71 169.92Q759.39 168.66 764.24 166.24Q769.09 163.82 772.25 162.63Q775.42 161.44 780.26 160.23Q785.11 159.02 786.39 159.02Q787.68 159.02 788.37 158.62Q789.06 158.23 794.30 157.83Q799.55 157.44 800.24 157.04Q800.93 156.65 819.62 156.65Q838.31 156.65 839.00 156.25Q839.69 155.85 845.73 155.46Q851.76 155.06 860.96 152.67Q870.15 150.27 879.75 145.97Q889.34 141.66 895.27 139.69Q901.21 137.71 904.17 137.29Q907.14 136.87 907.83 136.47Q908.52 136.08 910.60 136.08Q912.68 136.08 913.30 135.68Q913.91 135.28 913.99 135.28Q914.06 135.28 922.47 135.28Z"/>
+    <path id="flag" d="M940.17 196.97Q939.18 196.94 938.74 196.43Q938.29 195.91 938.29 164.66Q938.29 133.41 938.29 96.12Q938.29 58.84 937.65 57.65Q937.01 56.47 934.83 55.55Q932.65 54.64 930.87 54.61Q929.09 54.59 928.40 54.19Q927.71 53.80 921.28 53.80Q914.85 53.80 914.16 54.19Q913.47 54.59 911.79 54.59Q910.11 54.59 905.26 55.80Q900.42 57.01 894.68 58.96Q888.94 60.92 885.28 61.31Q881.63 61.71 880.93 62.10Q880.24 62.50 876.58 62.50Q872.92 62.50 872.23 62.90Q871.54 63.29 870.75 62.90Q869.96 62.50 866.69 62.50Q863.43 62.50 862.74 62.10Q862.05 61.71 860.66 61.68Q859.28 61.66 856.90 60.87Q854.53 60.08 852.50 58.77Q850.47 57.46 850.47 32.04Q850.47 6.63 850.72 6.23Q850.97 5.83 852.65 5.71Q854.33 5.59 855.62 6.33Q856.90 7.07 860.96 8.28Q865.01 9.49 871.44 9.49Q877.87 9.49 878.56 9.10Q879.25 8.70 880.93 8.70Q882.62 8.70 885.88 7.89Q889.14 7.07 890.82 6.33Q892.50 5.59 893.59 5.54Q894.68 5.49 896.36 4.75Q898.04 4.01 902.89 2.79Q907.73 1.58 911.79 1.19Q915.84 0.79 916.46 0.40Q917.08 0.00 917.15 0.00Q917.23 0.00 921.68 0.00Q926.13 0.00 926.82 0.40Q927.51 0.79 929.19 0.79Q930.87 0.79 934.93 2.00Q938.98 3.21 940.62 4.52Q942.25 5.83 942.25 100.87Q942.25 195.91 941.70 196.45Q941.16 196.99 941.16 196.99Q941.16 196.99 940.17 196.97Z"/>
+    <g id="lockup">
+      <g fill="currentColor"><use href="#l1"/><use href="#l2"/><use href="#l3"/><use href="#l4"/><use href="#l5"/><use href="#l6"/><use href="#l7"/><use href="#ball"/></g>
+      <g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><use href="#green"/><use href="#flag"/></g>
+    </g>
+  </defs>
+</svg>
+
+<div class="intro-layer" id="intro" aria-hidden="true">
+  <div class="intro-bg"></div>
+  <svg class="intro-logo" viewBox="0 0 1000 261.1">
+    <g fill="currentColor">
+      <use href="#l1" class="i-ltr"/><use href="#l2" class="i-ltr"/><use href="#l3" class="i-ltr"/><use href="#l4" class="i-ltr"/><use href="#l5" class="i-ltr"/><use href="#l6" class="i-ltr"/><use href="#l7" class="i-ltr"/>
+      <use href="#ball" class="i-ball"/>
+    </g>
+    <g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+      <use href="#green" class="i-green"/><use href="#flag" class="i-flag"/>
+    </g>
+  </svg>
+</div>
+
+<header class="bar">
+  <a class="brand" href="#top" aria-label="Stuckit, back to top">
+    <svg class="lockup" id="brand-logo" viewBox="0 0 1000 261.1" role="img" aria-label="Stuckit"><use href="#lockup"/></svg>
+  </a>
+  <div class="actions">
+    <span class="store" role="img" aria-label="App Store, coming soon"><small>Coming soon</small><span>App Store</span></span>
+    <button class="icon" id="theme" type="button" aria-label="Switch colour scheme">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M12 4.5a7.5 7.5 0 0 1 0 15z" fill="currentColor"/></svg>
+    </button>
+    <button class="icon" id="burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M4 9h16M4 15h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="menu" id="menu" aria-hidden="true">
+  <div class="top">
+    <span class="brand"><svg class="lockup" viewBox="0 0 1000 261.1" aria-hidden="true"><use href="#lockup"/></svg></span>
+    <button class="icon" id="close" type="button" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <nav aria-label="Menu">
+    <p>App Store <small>Coming soon</small></p>
+    <a href="privacy.html">Privacy</a>
+    <a href="support.html">Support</a>
+  </nav>
+</div>
+
+<main id="top">
+  <section class="hero">
+    <div class="words">
+      <h1 class="reveal" data-delay="0.1">Stuckit measures how far back you take the club on every wedge shot, from your Apple&nbsp;Watch, as a percentage of your full backswing.</h1>
+      <p class="sub reveal" data-delay="0.35">A backswing that changes length is one reason wedges&nbsp;scatter.</p>
+    </div>
+    <div class="devices">
+      
+      <div class="dev phone">
+        <img class="screen" src="assets/screen-reading.jpg" alt="" width="520" height="1130" data-delay="0.1">
+        <picture>
+          <source data-dark srcset="assets/iphone-silver.png" media="(prefers-color-scheme: dark)">
+          <img class="bezel" src="assets/iphone-black.png" width="560" height="1145" fetchpriority="high"
+               alt="iPhone showing a Stuckit shot reading: about 75% of full backswing">
+        </picture>
+      </div>
+      <div class="dev watch">
+        <img class="screen" src="assets/screen-watch.jpg" alt="" width="300" height="358" data-delay="0.3">
+        <picture>
+          <source data-dark srcset="assets/watch-natural.png" media="(prefers-color-scheme: dark)">
+          <img class="bezel" src="assets/watch-slate.png" width="320" height="503"
+               alt="Apple Watch running Stuckit, ready for a swing">
+        </picture>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>Stuckit &copy; 2026</span>
+  <nav aria-label="Legal"><a href="privacy.html">Privacy</a><a href="support.html">Support</a></nav>
+</footer>
+
+<script type="module">
+  import { animate } from "./assets/motion-mini-11.13.5.js";
+  const root = document.documentElement;
+  const ease = [0.2, 0.7, 0.2, 1];
+
+  const done = (c) => (c && c.finished ? c.finished : Promise.resolve(c));
+
+  function reveal() {
+    const els = [...document.querySelectorAll('.reveal, .screen')];
+    els.forEach((el) => {
+      el.style.opacity = '0';
+      if (el.classList.contains('reveal')) el.style.transform = 'translateY(18px)';
+    });
+    root.classList.remove('pre');
+    els.forEach((el) => {
+      const lift = el.classList.contains('reveal');
+      const clear = () => { el.style.opacity = ''; el.style.transform = ''; };
+      try {
+        done(animate(el,
+          lift ? { opacity: [0, 1], transform: ['translateY(18px)', 'translateY(0px)'] } : { opacity: [0, 1] },
+          { duration: lift ? 0.9 : 1.1, delay: Number(el.dataset.delay || 0), ease }
+        )).then(clear, clear);
+      } catch (e) { clear(); }
+    });
+  }
+
+  async function intro(layer) {
+    window.__introRunning = true;
+    const q = (s) => layer.querySelector(s);
+    const green = q('.i-green'), flag = q('.i-flag'), ball = q('.i-ball');
+    const letters = [...layer.querySelectorAll('.i-ltr')];
+    const lg = document.getElementById('green').getTotalLength() || 2600;
+    const lf = document.getElementById('flag').getTotalLength() || 1200;
+    green.style.strokeDasharray = lg; green.style.strokeDashoffset = lg;
+    flag.style.strokeDasharray = lf; flag.style.strokeDashoffset = lf;
+    ball.style.opacity = '0';
+    letters.forEach((l) => { l.style.opacity = '0'; });
+
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      window.__introDone = true;
+      layer.remove();
+      root.classList.remove('intro');
+      try { sessionStorage.setItem('stuckit-intro', '1'); } catch (e) {}
+      try { reveal(); } finally { root.classList.remove('pre'); }
+    };
+    layer.addEventListener('click', finish);
+    window.addEventListener('keydown', finish, { once: true });
+
+    const drawing = [
+      animate(green, { strokeDashoffset: [lg, 0] }, { duration: 0.7, ease }),
+      animate(flag, { strokeDashoffset: [lf, 0] }, { duration: 0.5, delay: 0.5, ease }),
+      animate(ball, {
+        opacity: [0, 1, 1, 1, 1],
+        transform: ['translate(-150px, -170px)', 'translate(-40px, 0px)', 'translate(-18px, -26px)', 'translate(-4px, 0px)', 'translate(0px, 0px)'],
+      }, { duration: 0.6, delay: 0.8 }),
+      ...letters.map((l, i) => animate(l,
+        { opacity: [0, 1], transform: ['translateY(30px)', 'translateY(0px)'] },
+        { duration: 0.35, delay: 0.95 + i * 0.05, ease })),
+    ];
+    await Promise.all(drawing.map(done));
+    if (finished) return;
+
+    const logo = q('.intro-logo');
+    const from = logo.getBoundingClientRect();
+    const to = document.getElementById('brand-logo').getBoundingClientRect();
+    const scale = to.width / from.width;
+    await Promise.all([
+      done(animate(logo,
+        { transform: ['translate(0px, 0px) scale(1)', `translate(${to.left - from.left}px, ${to.top - from.top}px) scale(${scale})`] },
+        { duration: 0.75, delay: 0.25, ease: [0.65, 0, 0.25, 1] })),
+      done(animate(q('.intro-bg'), { opacity: [1, 0] }, { duration: 0.5, delay: 0.6 })),
+    ]);
+    finish();
+  }
+
+  const layer = document.getElementById('intro');
+  if (!window.__shown && root.classList.contains('pre')) {
+    if (layer && root.classList.contains('intro')) {
+      intro(layer).catch(() => {
+        window.__introDone = true;
+        layer.remove();
+        root.classList.remove('intro', 'pre');
+      });
+    }
+    else reveal();
+  }
+</script>
+
+<script>
+(function () {
+  var root = document.documentElement;
+
+  var dark = matchMedia('(prefers-color-scheme: dark)');
+  var toggle = document.getElementById('theme');
+  function current() { return root.getAttribute('data-theme') || (dark.matches ? 'dark' : 'light'); }
+  function sync() {
+    var chosen = root.getAttribute('data-theme');
+    document.querySelectorAll('source[data-dark]').forEach(function (s) {
+      s.media = chosen ? (chosen === 'dark' ? 'all' : 'not all') : '(prefers-color-scheme: dark)';
+    });
+    toggle.setAttribute('aria-label', current() === 'dark' ? 'Switch to light' : 'Switch to dark');
+  }
+  toggle.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('stuckit-theme', next); } catch (e) {}
+    sync();
+  });
+  if (dark.addEventListener) dark.addEventListener('change', sync);
+  sync();
+
+  var menu = document.getElementById('menu');
+  var burger = document.getElementById('burger');
+  function setMenu(open) {
+    document.body.classList.toggle('menu-open', open);
+    burger.setAttribute('aria-expanded', String(open));
+    menu.setAttribute('aria-hidden', String(!open));
+    if (open) document.getElementById('close').focus(); else burger.focus();
+  }
+  burger.addEventListener('click', function () { setMenu(true); });
+  document.getElementById('close').addEventListener('click', function () { setMenu(false); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.body.classList.contains('menu-open')) setMenu(false);
+  });
+})();
+</script>
+</body>
+</html>
